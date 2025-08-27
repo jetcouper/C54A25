@@ -34,13 +34,11 @@ class AjouterActivity : AppCompatActivity() {
             insets
         }
     }
-    // Inner class listener (like your Java version)
+
     private inner class Ecouteur : View.OnClickListener {
         override fun onClick(v: View?) {
-            if (v === boutonAjouter) {
-                val i = Intent(this@AjouterActivity, MainActivity::class.java)
-                startActivity(i)
-            }
+            
+
         }
     }
 
