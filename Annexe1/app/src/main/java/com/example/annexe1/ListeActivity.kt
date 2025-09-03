@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.io.BufferedReader
+import java.io.FileNotFoundException
 import java.io.InputStreamReader
 
 class ListeActivity : AppCompatActivity() {
@@ -31,27 +32,52 @@ class ListeActivity : AppCompatActivity() {
     }
 
     fun lireMemos():ArrayList<String>{
-        //Flux de données
-        val ofi = openFileInput("fichier.txt")
-        val isr = InputStreamReader(ofi)
-        val br = BufferedReader(isr)
+        var arrayliste = ArrayList<String>()
+        var valeur: Double = 0.0
 
-        val arrayliste = ArrayList<String>()
+        try {
+            //Flux de données
+            val ofi = openFileInput("fichier.txt")
+            val isr = InputStreamReader(ofi)
+            val br = BufferedReader(isr)
 
-        //Version du prof
-//        var ligne = br.readLine()
-//        while (ligne != null){
-//            arrayliste.add(ligne)
-//            ligne = br.readLine()
-//        }
-//        br.close()
+            //Permet de fermer le br lorsque terminé / exception
+            br.use {
+                //Version du prof
+//              var ligne = br.readLine()
+//              while (ligne != null){
+//              arrayliste.add(ligne)
+//              ligne = br.readLine()
+//              }
+//              br.close()
 
-        //Ma version
-        for(line in br.lines()){
-            arrayliste.add(line)
+                //Ma version
+                for(line in br.lines()){
+                    arrayliste.add(line)
+                }
+                //3e façon
+                //br.use {
+                //    arrayliste = br.readLine() as ArrayList<String> //Transtypage
+                //}
+
+                //Autre façon
+//                br.use {
+//                    br.forEachLine { ligne -> arrayliste.add(ligne) }
+//                }
+                //4e façon
+//                br.use {
+//                    br.forEachLine { arrayliste.add(it) }// it : cette ligne-là
+//                }
+
+
+
+            }
+
+        }
+        catch (fnfe: FileNotFoundException){
+            fnfe.printStackTrace()
         }
 
-        br.close()
         return arrayliste
     }
 
