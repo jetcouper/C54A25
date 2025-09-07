@@ -13,6 +13,8 @@ import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.util.Scanner
+import java.util.Vector
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var questionC: TextView
     lateinit var questionDTexte: EditText
     lateinit var questionDButton: Button
+    lateinit var question3: TextView
+    lateinit var questionPlanete: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +47,12 @@ class MainActivity : AppCompatActivity() {
 
         questionDTexte = findViewById(R.id.txtNom)
         questionDButton = findViewById(R.id.btnQuestionD)
+
+        question3 = findViewById(R.id.txtReponseScanner)
+        question3.setText(question3A())
+
+        questionPlanete = findViewById(R.id.txtPlanete)
+        questionPlanete.setText(planeteCount().toString())
 
         questionDButton.setOnClickListener{
             questionD()
@@ -117,6 +127,52 @@ class MainActivity : AppCompatActivity() {
         questionDTexte.text.clear()
         Toast.makeText(this,  "$nom à été ajouté.", Toast.LENGTH_LONG ).show()
     }
+
+    fun question3A():String{
+
+
+        var nombreMot : Int = 0
+        val ofi = openFileInput("texte.txt")
+        val isr = InputStreamReader(ofi)
+        val br = BufferedReader(isr)
+
+        val scanner = Scanner(br)
+
+        while (scanner.hasNext()){
+            scanner.next()
+            nombreMot++
+
+        }
+        scanner.close()
+        br.close()
+
+        return nombreMot.toString()
+    }
+
+    fun planeteCount():Int{
+        val ofi = openFileInput("texte2.txt")
+        val isr = InputStreamReader(ofi)
+        val br = BufferedReader(isr)
+        val listePlanete: Vector<Planete> = Vector()
+
+        val scanner = Scanner(br)
+
+        while (scanner.hasNextLine()){
+            val ligne = scanner.nextLine()
+            val parti = ligne.split("\\s+".toRegex())
+
+            if(parti.size == 2){
+                val nom:String = parti[0]
+                val nombre:Int = parti[1].toInt()
+                val planet = Planete(nom,nombre)
+                listePlanete.add(planet)
+            }
+        }
+        return listePlanete.count()
+    }
+
+
+
 
 
 
