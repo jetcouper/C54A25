@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.io.BufferedReader
 import java.io.BufferedWriter
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.util.Scanner
@@ -130,27 +131,44 @@ class MainActivity : AppCompatActivity() {
 
     fun question3A():String{
 
-
-        var nombreMot : Int = 0
+        //Version prof
         val ofi = openFileInput("texte.txt")
-        val isr = InputStreamReader(ofi)
-        val br = BufferedReader(isr)
+        var compteur = 0
 
-        val scanner = Scanner(br)
-
-        while (scanner.hasNext()){
-            scanner.next()
-            nombreMot++
-
+        ofi.use{
+            val sc = Scanner(ofi)
+            //Je n'appelle pas useDelimiter car je veux que le délimiteur soit un charactère blanc
+            while (sc.hasNext()){
+                compteur++
+                sc.next()
+            }
         }
-        scanner.close()
-        br.close()
+        return compteur.toString()
 
-        return nombreMot.toString()
+
+
+        //Ma version
+//        var nombreMot : Int = 0
+//        val ofi = openFileInput("texte.txt")
+//        val isr = InputStreamReader(ofi)
+//        val br = BufferedReader(isr)
+//
+//        val scanner = Scanner(br)
+//
+//        while (scanner.hasNext()){
+//            scanner.next()
+//            nombreMot++
+//
+//        }
+//        scanner.close()
+//        br.close()
+//
+//        return nombreMot.toString()
     }
 
     fun planeteCount():Int{
         val ofi = openFileInput("texte2.txt")
+        //val ofi: InputStream = getResources().openRawResource(R.raw.texte2)
         val isr = InputStreamReader(ofi)
         val br = BufferedReader(isr)
         val listePlanete: Vector<Planete> = Vector()

@@ -1,0 +1,8 @@
+Mercure 0
+Venus 0
+Terre 1
+Mars 2
+Jupiter 97
+Saturne 274
+Uranus 29
+Neptune 16
