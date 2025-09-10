@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
             when(v){
                 boutonQuitter -> finish()
                 boutonAfficher -> {
-                    val i = Intent(this@MainActivity,ListeActivity::class.java)
+                    val i = Intent(this@MainActivity,AfficherActivity::class.java)
                     startActivity(i)
                 }
                 boutonAjouter -> {

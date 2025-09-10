@@ -1,6 +1,7 @@
 package com.example.annexe1b
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -166,27 +167,48 @@ class MainActivity : AppCompatActivity() {
 //        return nombreMot.toString()
     }
 
+
+
+//    fun planeteCount():Int{
+//        val ofi = openFileInput("texte2.txt")
+//        //val ofi: InputStream = getResources().openRawResource(R.raw.texte2)
+//        val isr = InputStreamReader(ofi)
+//        val br = BufferedReader(isr)
+//        val listePlanete: Vector<Planete> = Vector()
+//
+//        val scanner = Scanner(br)
+//
+//        while (scanner.hasNextLine()){
+//            val ligne = scanner.nextLine()
+//            val parti = ligne.split("\\s+".toRegex())
+//
+//            if(parti.size == 2){
+//                val nom:String = parti[0]
+//                val nombre:Int = parti[1].toInt()
+//                val planet = Planete(nom,nombre)
+//                listePlanete.add(planet)
+//            }
+//        }
+//        return listePlanete.count()
+//    }
+
+    //Version prof
     fun planeteCount():Int{
-        val ofi = openFileInput("texte2.txt")
-        //val ofi: InputStream = getResources().openRawResource(R.raw.texte2)
-        val isr = InputStreamReader(ofi)
-        val br = BufferedReader(isr)
-        val listePlanete: Vector<Planete> = Vector()
 
-        val scanner = Scanner(br)
+        val ofi: InputStream = getResources().openRawResource(R.raw.texte2)
+        val listePlanete = ArrayList<Planete>()
+        var total : Int = 0
+        val scanner = Scanner(ofi)
 
-        while (scanner.hasNextLine()){
-            val ligne = scanner.nextLine()
-            val parti = ligne.split("\\s+".toRegex())
+        while (scanner.hasNext()){
+            var temp = Planete(scanner.next(), scanner.nextInt());
+            listePlanete.add(temp)
+            total += temp.satellite
 
-            if(parti.size == 2){
-                val nom:String = parti[0]
-                val nombre:Int = parti[1].toInt()
-                val planet = Planete(nom,nombre)
-                listePlanete.add(planet)
-            }
         }
-        return listePlanete.count()
+
+        Log.i("Test", listePlanete.elementAt(3).nom);
+        return listePlanete.size
     }
 
 
