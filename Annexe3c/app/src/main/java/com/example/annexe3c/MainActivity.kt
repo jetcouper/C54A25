@@ -26,8 +26,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var dent1: LinearLayout
     lateinit var dent2: LinearLayout
 
-    var dent:Dent? = null
-    var dents = mutableListOf<Dent>()
+    //var dent:Dent? = null
+    var dents = ArrayList<Dent>()
 
 
 
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
 
             }
-            dent = null;
+            dents.clear();
         }
         catch (io: IOException){
             io.printStackTrace()
