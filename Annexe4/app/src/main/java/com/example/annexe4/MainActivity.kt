@@ -1,6 +1,7 @@
 package com.example.annexe4
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -11,9 +12,11 @@ import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import java.io.Serializable
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,10 +49,13 @@ class MainActivity : AppCompatActivity() {
     }
     //Le retour du boomerang, on revient ici après l'inscription du nom
     inner class CallBackText : ActivityResultCallback<ActivityResult> {
+
         override fun onActivityResult(result: ActivityResult) {
             var i = result.data
-            user = i.getSerializableExtra("user",Utilisateur::class.java)
 
+            user = i!!.getSerializableExtraCompat("user",Utilisateur::class.java) //A faire
+
+            texte.text = "Bonjour " + user!!.prenom.toString() + " " + user!!.nom.toString()
 
         }
     }
@@ -60,6 +66,14 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+    }
+    fun <T : Serializable> Intent.getSerializableExtraCompat(name: String, clazz: Class<T>): T? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSerializableExtra(name, clazz)
+        } else {
+            @Suppress("DEPRECATION")
+            getSerializableExtra(name) as? T
+        }
     }
 
 }
