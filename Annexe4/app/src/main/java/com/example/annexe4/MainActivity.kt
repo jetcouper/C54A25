@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -38,42 +40,49 @@ class MainActivity : AppCompatActivity() {
         bouton = findViewById(R.id.btnConnaitre)
         texte = findViewById(R.id.txtBonjour)
 
-        val ec = Ecouteur()
-        bouton.setOnClickListener(ec)
+        //Le v n'est pas néssessaire ni l'écouteur
+        bouton.setOnClickListener{v:View -> lanceur.launch(Intent(this@MainActivity,RepondreActivity::class.java))}
+
 
         lanceur = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
-            CallBackText()
+            CallBackText() //Nom inventer
         )
+//        if(texte.text == ""){
+//            if(savedInstanceState != null){
+//                user = savedInstanceState!!.getSerializable("user") as Utilisateur
+//                texte.text = "Bonjour " + user!!.prenom + " " + user!!.nom
+//            }
+//        }
 
     }
     //Le retour du boomerang, on revient ici après l'inscription du nom
     inner class CallBackText : ActivityResultCallback<ActivityResult> {
 
         override fun onActivityResult(result: ActivityResult) {
-            var i = result.data
+            if(result.resultCode == RESULT_OK){
+                var i = result.data
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                    user = i!!.getSerializableExtra("user",Utilisateur::class.java)
+                }
+                else{
+                    user = i!!.getSerializableExtra("user") as Utilisateur?
+                }
 
-            user = i!!.getSerializableExtraCompat("user",Utilisateur::class.java) //A faire
+                texte.text = "Bonjour ${user?.prenom} ${user?.nom}"
+            }
 
-            texte.text = "Bonjour " + user!!.prenom.toString() + " " + user!!.nom.toString()
 
         }
     }
-    inner class Ecouteur : View.OnClickListener {
-        override fun onClick(v: View?) {
-            lanceur.launch(Intent(this@MainActivity,RepondreActivity::class.java))
 
-
-        }
-
-    }
-    fun <T : Serializable> Intent.getSerializableExtraCompat(name: String, clazz: Class<T>): T? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getSerializableExtra(name, clazz)
-        } else {
-            @Suppress("DEPRECATION")
-            getSerializableExtra(name) as? T
-        }
-    }
-
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//
+//        if(user != null){
+//            val utilisateur = Utilisateur(user!!.nom,user!!.prenom)
+//
+//            outState.putSerializable("user",utilisateur)
+//        }
+//    }
 }

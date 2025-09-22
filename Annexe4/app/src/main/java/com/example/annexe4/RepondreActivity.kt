@@ -33,24 +33,15 @@ class RepondreActivity : AppCompatActivity() {
 
 
 
-        val ec = Ecouteur()
-        boutonConfirmer.setOnClickListener(ec)
 
-
-    }
-    inner class Ecouteur : View.OnClickListener {
-        override fun onClick(v: View?) {
+        boutonConfirmer.setOnClickListener {
+            var i = Intent() //De retour
             var user = Utilisateur(texteNom.text.toString(),textePrenom.text.toString())
-            var i = Intent(this@RepondreActivity,MainActivity::class.java)
             i.putExtra("user",user)
             setResult(RESULT_OK,i)
-            finish()
+            finish() //Superposées . Visuellement je revient à MainActivity
         }
 
-    }
 
-    override fun onStop() {
-        super.onStop()
-        finish()
     }
 }
