@@ -1,0 +1,10 @@
+Bacon, 6.29, Provigain
+Sac Pommes, 5.99, IGB
+Sac Pommes, 4.99, Provigain
+Soupe, 0.99, Maytro
+Bacon, 5.99, Maxxi
+Céréales, 4.99, Maytro
+Céréales, 5.29, Maxxi
+Soupe, 0.89, Maxxi
+Soupe, 0.99, Provigain
+Sac Pommes, 7.89, Maytro
