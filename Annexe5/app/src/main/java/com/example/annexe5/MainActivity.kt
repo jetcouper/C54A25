@@ -1,9 +1,15 @@
 package com.example.annexe5
 
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -13,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var listeMusique:ListView
     lateinit var adapter: SimpleAdapter
+    var v:ArrayList<HashMap<String,Any>> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,17 +30,50 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        val ec = Ecouteur()
+
 
         listeMusique = findViewById(R.id.listeChanson)
-
-
-
-
+        v = remplirArrayListe()
         val from = arrayOf("No", "Title", "Date", "Image")
         val to = intArrayOf(R.id.noChanson, R.id.titreChanson,R.id.dateChanson,R.id.imageChanson) // IDs of views in your list_item_layout.xml
 
-        adapter = SimpleAdapter(this, remplirArrayListe(), R.layout.layoutlist, from, to)
+        adapter = SimpleAdapter(this, v, R.layout.layoutlist, from, to)
         listeMusique.setAdapter(adapter)
+
+        //listeMusique.setOnItemClickListener(ec) //Java style
+        listeMusique.onItemClickListener = ec //Kotlin style
+
+
+        //Version lambda
+//        listeMusique.setOnItemClickListener{_, view , _, _ ->
+//            val parent = view as LinearLayout
+//            val chamNom = parent.findViewById<TextView>(R.id.titreChanson)
+//            Toast.makeText(
+//                this@MainActivity,
+//                chamNom.text.toString(),
+//                Toast.LENGTH_SHORT
+//            ).show()
+//
+//        }
+
+    }
+
+    inner class Ecouteur : OnItemClickListener {
+        override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+
+            //On part de position
+//            val nomChanson = v[position]["Title"] as String
+//
+//            Toast.makeText(this@MainActivity,nomChanson, Toast.LENGTH_SHORT).show()
+
+            //On part du paramètre View
+            val linearlayout = view as LinearLayout
+            val textview = linearlayout.findViewById<TextView>(R.id.titreChanson)
+            Toast.makeText(this@MainActivity,textview.text.toString(), Toast.LENGTH_SHORT).show()
+
+
+        }
 
     }
 
