@@ -13,7 +13,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 
 class MainActivity : AppCompatActivity() {
-
+    val url = "https://api.jsonbin.io/v3/b/67fe6a908a456b796689f63d?meta=false"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,9 +28,9 @@ class MainActivity : AppCompatActivity() {
 
         val queue = Volley.newRequestQueue(this)
 
-        val url = "https://api.jsonbin.io/v3/b/67fe6a908a456b796689f63d?meta=false"
 
-        //Ma version
+
+        //Ma version simplifier
 //        val stringRequest = StringRequest(
 //            Request.Method.GET, url,
 //            { response ->
@@ -38,13 +38,16 @@ class MainActivity : AppCompatActivity() {
 //            },
 //            { Toast.makeText(this@MainActivity,"Erreur",Toast.LENGTH_LONG).show() })
 
-        //Version prof
+
+
+
+        //Version prof non-simplifier
         val stringRequest = StringRequest(
             Request.Method.GET, url,
             Repondeur(),
             RepondeurErreur())
 
-        queue.add(stringRequest)
+        queue.add(stringRequest) // important
 
     }
 

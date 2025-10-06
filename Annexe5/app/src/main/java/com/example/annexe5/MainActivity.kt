@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         listeMusique = findViewById(R.id.listeChanson)
         v = remplirArrayListe()
         val from = arrayOf("No", "Title", "Date", "Image")
+
         val to = intArrayOf(R.id.noChanson, R.id.titreChanson,R.id.dateChanson,R.id.imageChanson) // IDs of views in your list_item_layout.xml
 
         adapter = SimpleAdapter(this, v, R.layout.layoutlist, from, to)

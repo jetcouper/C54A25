@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    implementation("com.beust:klaxon:5.5")
     implementation(libs.volley)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
