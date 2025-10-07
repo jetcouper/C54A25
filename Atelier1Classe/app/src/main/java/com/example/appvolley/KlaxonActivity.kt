@@ -18,6 +18,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.beust.klaxon.Klaxon
 import org.json.JSONArray
+import org.json.JSONObject
 
 class KlaxonActivity : AppCompatActivity() {
     val url = "https://api.jsonbin.io/v3/b/67fe6a908a456b796689f63d?meta=false"
@@ -44,6 +45,9 @@ class KlaxonActivity : AppCompatActivity() {
             Request.Method.GET, url,
             { response ->
                 val li:ListeProduits = Klaxon().parse<ListeProduits>(response) ?: ListeProduits()
+                val jsonObject = JSONObject(response)
+                val jsonarray = jsonObject.getJSONArray("accessoires")
+                decomposerReponse(jsonarray)
                 Toast.makeText(this@KlaxonActivity,"Response is: ${li.articles.size}",Toast.LENGTH_LONG).show()
             },
             { Toast.makeText(this@KlaxonActivity,"Erreur",Toast.LENGTH_LONG).show() })
@@ -67,11 +71,8 @@ class KlaxonActivity : AppCompatActivity() {
 
 
         val from = arrayOf("nom", "prix")
-
         val to = intArrayOf(R.id.txtNom, R.id.txtPrix)
-
         val adapter = SimpleAdapter(this,remplir,R.layout.layoutlist,from,to)
-
         liste.setAdapter(adapter)
 
 
