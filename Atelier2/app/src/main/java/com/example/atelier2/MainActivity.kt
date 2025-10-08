@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var lecteurYoutube: YouTubePlayerView
     val mp3url = "https://storage.googleapis.com/uamp/The_Kyoto_Connection_-_Wake_Up/01_-_Intro_-_The_Way_Of_Waking_Up_feat_Alan_Watts.mp3"
     val video = "https://youtu.be/16y1AkoZkmQ"
+    var player : ExoPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,13 +32,7 @@ class MainActivity : AppCompatActivity() {
         }
         lecteur = findViewById(R.id.playerView)
         lecteurYoutube = findViewById(R.id.youtube_player_view)
-        //Lecteur audio
-        val player = ExoPlayer.Builder(this@MainActivity).build()
-        lecteur.player = player
-        val media = MediaItem.fromUri(mp3url)
-        player.addMediaItem(media)
-        player.prepare()
-        player.pause()
+        player = ExoPlayer.Builder(this@MainActivity).build()
 
         //lecteur youtube (Fait par moi)
         lifecycle.addObserver(lecteurYoutube)
@@ -46,11 +41,26 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onStart() {
+        super.onStart()
+        //Lecteur audio
+        lecteur.player = player
+        val media = MediaItem.fromUri(mp3url)
+        //player!!.addMediaItem(media) //Pour plusieurs
+        player?.setMediaItem(media) //Pour un item
+        player?.prepare()
+        //player?.play() //Si tu veux démarrer tout de suite.
+        player?.pause()
+
+    }
+
     //Fait par moi.
     inner class Ecouteur : AbstractYouTubePlayerListener(){
         override fun onReady(youTubePlayer: YouTubePlayer) {
             val videoId = "16y1AkoZkmQ"
-            youTubePlayer.loadVideo(videoId,0f)
+            youTubePlayer.cueVideo(videoId, 0f)
+            //youTubePlayer.loadVideo(videoId,0f)
         }
     }
 

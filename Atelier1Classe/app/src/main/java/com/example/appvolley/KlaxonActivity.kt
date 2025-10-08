@@ -23,7 +23,6 @@ import org.json.JSONObject
 class KlaxonActivity : AppCompatActivity() {
     val url = "https://api.jsonbin.io/v3/b/67fe6a908a456b796689f63d?meta=false"
     lateinit var liste : ListView
-    //var v:ArrayList<HashMap<String,Any>> = ArrayList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,9 +73,6 @@ class KlaxonActivity : AppCompatActivity() {
         val to = intArrayOf(R.id.txtNom, R.id.txtPrix)
         val adapter = SimpleAdapter(this,remplir,R.layout.layoutlist,from,to)
         liste.setAdapter(adapter)
-
-
-
     }
     inner class Ecouteur : OnItemClickListener {
         override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
