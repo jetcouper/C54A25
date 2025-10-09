@@ -7,20 +7,23 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.beust.klaxon.Klaxon
-import com.example.atelier3observerpattern.ObservateurChangement
-import com.example.atelier3observerpattern.Sujet
+import com.example.tp1.Sujet
 import org.json.JSONArray
 import org.json.JSONObject
+import android.text.format.DateUtils
 
 class ModeleChanson(context: Context) : Sujet {
-    val url = "https://api.jsonbin.io/v3/b/67fe6a908a456b796689f63d?meta=false"
-
+    val url = "https://api.jsonbin.io/v3/b/680a6a1d8561e97a5006b822?meta=false"
+    var contexte: Context ?= null
+    var listemusique = ArrayList<HashMap<String, Any>>()
+    private val observateurs = mutableListOf<ObservateurChangement>()
 
     init {
         initialiserListe(context)
     }
 
     private fun initialiserListe(context: Context) {
+        contexte = context
         val queue = Volley.newRequestQueue(context)
         val stringRequest = StringRequest(
             Request.Method.GET, url,
@@ -28,44 +31,55 @@ class ModeleChanson(context: Context) : Sujet {
                 val li:ListeMusiques = Klaxon().parse<ListeMusiques>(response) ?: ListeMusiques()
                 val jsonObject = JSONObject(response)
                 val jsonarray = jsonObject.getJSONArray("music")
-                decomposerReponse(jsonarray)
-                Toast.makeText(context,"Response is: ${li.articles.size}", Toast.LENGTH_LONG).show()
+                listemusique = decomposerReponse(jsonarray)
+                //Avertir l'activité avec l'observateur, après le changement de la liste
+                avertirObservateurs()
+                Toast.makeText(context,"Response is: ${li.musiques.size}", Toast.LENGTH_LONG).show()
             },
             {
                 Toast.makeText(context,"Erreur", Toast.LENGTH_LONG).show()
             })
         queue.add(stringRequest)
     }
-    fun decomposerReponse(tab: JSONArray)
-    {
+    fun decomposerReponse(tab: JSONArray): ArrayList<HashMap<String,Any>> {
         val remplir = ArrayList<HashMap<String,Any>>()
 
         for (i in 0..tab.length() -1)
         {
             val itemMap = HashMap<String, Any>()
-            itemMap.put("nom",tab.getJSONObject(i).get("nom").toString())
-            itemMap.put("prix",tab.getJSONObject(i).get("prix").toString() + " $")
+            itemMap.put("id",tab.getJSONObject(i).get("id").toString())
+            itemMap.put("title",tab.getJSONObject(i).get("title").toString())
+            itemMap.put("album",tab.getJSONObject(i).get("album").toString())
+            itemMap.put("artist",tab.getJSONObject(i).get("artist").toString())
+            itemMap.put("genre",tab.getJSONObject(i).get("genre").toString())
+            itemMap.put("source",tab.getJSONObject(i).get("source").toString())
+            itemMap.put("image",tab.getJSONObject(i).get("image").toString())
+            itemMap.put("trackNumber",tab.getJSONObject(i).get("trackNumber"))
+            itemMap.put("totalTrackCount",tab.getJSONObject(i).get("totalTrackCount"))
+            itemMap.put("duration", DateUtils.formatElapsedTime(tab.getJSONObject(i).getInt("duration").toLong()))
+            itemMap.put("site",tab.getJSONObject(i).get("site").toString())
             remplir.add(itemMap)
         }
-
-
-        //A faire
-        //val from = arrayOf("nom", "prix")
-        //val to = intArrayOf(R.id.txtNom, R.id.txtPrix)
-        //val adapter = SimpleAdapter(this,remplir,R.layout.layoutlist,from,to)
-        //liste.setAdapter(adapter)
+        return remplir
     }
 
 
+
+    fun retourListeMusique(): ArrayList<HashMap<String, Any>> {
+        return listemusique
+    }
+
     override fun ajouterObservateur(o: ObservateurChangement) {
-        TODO("Not yet implemented")
+        observateurs.add(o)
     }
 
     override fun enleverObservateur(o: ObservateurChangement) {
-        TODO("Not yet implemented")
+        observateurs.remove(o)
     }
 
     override fun avertirObservateurs() {
-        TODO("Not yet implemented")
+        for(obs in observateurs){
+            obs.changement(listemusique.size)
+        }
     }
 }

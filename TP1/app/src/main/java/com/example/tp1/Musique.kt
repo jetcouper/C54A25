@@ -1,5 +1,6 @@
 package com.example.tp1
 
+import java.io.Serializable
 import kotlin.time.Duration
 
 data class Musique(val id:String,
@@ -10,7 +11,7 @@ data class Musique(val id:String,
                    val title:String,
                    val artist:String,
                    val source:String,
-                   val duration:Duration,
+                   val duration: Int,
                    val trackNumber:Int,
                    val totalTrackCount:Int
 
