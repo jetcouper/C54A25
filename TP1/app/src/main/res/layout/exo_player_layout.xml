@@ -1,0 +1,143 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="#00000000"
+    android:layoutDirection="ltr"
+    android:orientation="vertical"
+    tools:targetApi="28">
+
+    <LinearLayout
+        android:id="@+id/bouton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="4dp">
+
+        <ImageButton
+            android:id="@+id/precedant"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/previous"
+            android:tintMode="src_in" />
+
+        <ImageButton
+            android:id="@+id/reculer"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/rewind"
+            android:tintMode="src_in" />
+
+        <ImageButton
+            android:id="@+id/melanger"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/shuffle"
+            android:tintMode="src_in" />
+
+        <ImageButton
+            android:id="@+id/repeter"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/repeat"
+            android:tintMode="src_in" />
+
+        <ImageButton
+            android:id="@+id/play"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/play"
+            android:tintMode="src_in" />
+
+        <ImageButton
+            android:id="@+id/pause"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/pause"
+            android:tintMode="src_in" />
+
+        <ImageButton
+            android:id="@+id/avancer"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:rotation="180"
+            android:scaleType="centerInside"
+            android:src="@drawable/rewind"
+            android:tintMode="src_in" />
+
+        <ImageButton
+            android:id="@+id/suivant"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:rotation="180"
+            android:scaleType="centerInside"
+            android:src="@drawable/previous"
+            android:tintMode="src_in" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/position_debut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:textColor="#ff323232"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <androidx.media3.ui.DefaultTimeBar
+            android:id="@id/exo_progress"
+            android:layout_width="0dp"
+            android:layout_height="26dp"
+            android:layout_weight="1"
+            app:played_color="#00BFFF"
+            app:unplayed_color="#00BFFF" />
+
+        <TextView
+            android:id="@+id/position_fin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:textColor="#ff323232"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>

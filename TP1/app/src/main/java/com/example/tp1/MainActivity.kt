@@ -19,6 +19,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.bumptech.glide.Glide
 import com.example.tp1.Sujet
+import java.io.Serializable
 
 class MainActivity : AppCompatActivity(), ObservateurChangement {
 
@@ -49,11 +50,13 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
         override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 
             //val linearlayout = view as LinearLayout
-            val item = parent?.getItemAtPosition(position) as HashMap<String, Any>
+            val item = listemusique
+            val itemPos = position
 
             //val textview = linearlayout.findViewById<TextView>(R.id.txtTitle)
             val intent = Intent(this@MainActivity, LecteurActivity::class.java)
-            intent.putExtra("musique", item)
+            intent.putExtra("musique", item as Serializable)
+            intent.putExtra("position", itemPos)
             startActivity(intent)
             //Toast.makeText(this@MainActivity,textview.text.toString(), Toast.LENGTH_SHORT).show()
 

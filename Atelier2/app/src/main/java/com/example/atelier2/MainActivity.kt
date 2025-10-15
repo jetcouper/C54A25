@@ -31,10 +31,10 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         lecteur = findViewById(R.id.playerView)
-        lecteurYoutube = findViewById(R.id.youtube_player_view)
         player = ExoPlayer.Builder(this@MainActivity).build()
 
         //lecteur youtube (Fait par moi)
+        lecteurYoutube = findViewById(R.id.youtube_player_view)
         lifecycle.addObserver(lecteurYoutube)
         val ec = Ecouteur()
         lecteurYoutube.addYouTubePlayerListener(ec)
