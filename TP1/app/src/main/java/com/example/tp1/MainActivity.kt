@@ -1,5 +1,6 @@
 package com.example.tp1
 
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -18,12 +19,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.bumptech.glide.Glide
+import com.example.tp1.ModeleChanson
 import com.example.tp1.Sujet
 import java.io.Serializable
 
 class MainActivity : AppCompatActivity(), ObservateurChangement {
 
-    var leModele: Sujet? = null
+
     lateinit var liste : ListView
     var listemusique = ArrayList<HashMap<String,Any>>()
 
@@ -66,14 +68,14 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
 
     override fun onStart() {
         super.onStart()
-        leModele = ModeleChanson(this)
-        (leModele as ModeleChanson).ajouterObservateur(this)
+        ModeleChanson.init(applicationContext) //applicationContext pour éviter les memory leak
+        ModeleChanson.ajouterObservateur(this)
 
     }
 
     override fun changement(nouvelleValeur: Int) {
         //C'est ici que l'on réagi aux changement, on met à jour la ListView
-        listemusique = (leModele as ModeleChanson).retourListeMusique()
+        listemusique = ModeleChanson.retourListeMusique()
         val from = arrayOf("title","artist","duration","image")
         val to = intArrayOf(R.id.txtTitle, R.id.txtArtiste,R.id.txtTemp,R.id.imageChanson)
         val adapter = SimpleAdapter(this,listemusique,R.layout.layoutlistemusique,from,to)

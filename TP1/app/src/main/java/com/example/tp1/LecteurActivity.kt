@@ -1,17 +1,31 @@
 package com.example.tp1
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.TimeBar
+import java.net.URL
 import java.util.ArrayList
+import kotlin.time.toDuration
+import androidx.media3.common.util.UnstableApi
+import kotlin.time.DurationUnit
 
-class LecteurActivity : AppCompatActivity() , ObservateurChangement {
+@OptIn(UnstableApi::class)
+class LecteurActivity : AppCompatActivity() {
     lateinit var lecteur: PlayerView
     var player : ExoPlayer? = null
     lateinit var play: ImageButton
@@ -22,8 +36,14 @@ class LecteurActivity : AppCompatActivity() , ObservateurChangement {
     lateinit var preview: ImageButton
     lateinit var forward: ImageButton
     lateinit var playback: ImageButton
-    lateinit var hashMap : ArrayList<HashMap<String, Any>>
-    var position : Int = 0
+    lateinit var barprogress: DefaultTimeBar
+
+    lateinit var tempDepart: TextView
+    lateinit var tempFin: TextView
+    var hashMap : ArrayList<HashMap<String, Any>> ?= null
+    var position : Long = 0
+    lateinit var btnRetour: Button
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +54,43 @@ class LecteurActivity : AppCompatActivity() , ObservateurChangement {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        //play = findViewById(R.layout.exo_player_layout.)
-        hashMap = (intent.getSerializableExtra("musique") as? ArrayList<HashMap<String, Any>>)!!
+
+        hashMap = ModeleChanson.listemusique //Appel du singleton
+        position = intent!!.getIntExtra("position", 0).toLong()
+
 
         lecteur = findViewById(R.id.playerView)
         player = ExoPlayer.Builder(this).build()
         lecteur.player = player
-        //lecteur.useController = true
+        val playlist = ArrayList<MediaItem>()
+        if (hashMap != null) {
+            for (item in hashMap){
+                val imageBytes = try {
+                    URL(item["image"].toString()).readBytes()
+                } catch (e: Exception) {
+                    null
+                }
+
+                val metadata = MediaMetadata.Builder()
+                    .setTitle(item["title"].toString())
+                    .apply {
+                        if (imageBytes != null)
+                            setArtworkData(imageBytes, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
+                    }
+                    .build()
+
+                val mediaItem = MediaItem.Builder()
+                    .setUri(item["source"].toString())
+                    .setMediaMetadata(metadata)
+                    .build()
+
+                playlist.add(mediaItem)
+            }
+        }
+        player!!.setMediaItems(playlist)
+        player!!.prepare()
+        player!!.seekTo(position.toInt(),0)
+        player!!.play()
 
         play = lecteur.findViewById(R.id.play)
         pause = lecteur.findViewById(R.id.pause)
@@ -50,8 +100,13 @@ class LecteurActivity : AppCompatActivity() , ObservateurChangement {
         preview = lecteur.findViewById(R.id.precedant)
         forward = lecteur.findViewById(R.id.avancer)
         playback = lecteur.findViewById(R.id.reculer)
+        tempDepart = lecteur.findViewById(R.id.position_debut)
+        tempFin = lecteur.findViewById(R.id.position_fin)
+        btnRetour = findViewById(R.id.retour)
+        barprogress = lecteur.findViewById(R.id.progression)
 
         val ec = Ecouteur()
+        player!!.addListener(ec)
 
         play.setOnClickListener(ec)
         pause.setOnClickListener(ec)
@@ -61,13 +116,15 @@ class LecteurActivity : AppCompatActivity() , ObservateurChangement {
         preview.setOnClickListener(ec)
         forward.setOnClickListener(ec)
         playback.setOnClickListener(ec)
+        btnRetour.setOnClickListener(ec)
 
+
+        barprogress.addListener(ec)
 
 
     }
-    inner class Ecouteur: View.OnClickListener{
+    inner class Ecouteur: View.OnClickListener, Player.Listener, TimeBar.OnScrubListener{
         override fun onClick(v: View?) {
-
             when(v){
                 play -> {
                     player!!.play()
@@ -76,41 +133,79 @@ class LecteurActivity : AppCompatActivity() , ObservateurChangement {
                     player!!.pause()
                 }
                 shuffle -> {
-                    player!!.shuffleModeEnabled
-
+                    player!!.shuffleModeEnabled = true
                 }
-                repeat -> ""
+                repeat -> player!!.repeatMode
+
                 nextMusic -> {
-                    player!!.seekToNext()
+                    player!!.seekToNextMediaItem()
+
+
                 }
                 preview -> {
-                    player!!.seekBack()
+                    player!!.seekToPreviousMediaItem()
                 }
                 forward -> {
-                    var positionCourante = player!!.currentPosition
-                    var nouvellePosition = positionCourante + 1000
+                    var nouvellePosition = player!!.currentPosition + 10000
                     player!!.seekTo(nouvellePosition)
+
                 }
                 playback -> {
-                    var positionCourante = player!!.currentPosition
-                    var nouvellePosition = positionCourante - 1000
-                    if(nouvellePosition < 0){
-                        nouvellePosition = 0
-                        player!!.seekTo(nouvellePosition)
-                    }
+                    var nouvellePosition = (player!!.currentPosition - 10000).coerceAtLeast(0)
+                    player!!.seekTo(nouvellePosition)
 
+                }
+                btnRetour -> {
+                    finish()
                 }
 
             }
         }
 
+        override fun onMediaItemTransition(mediaItem: MediaItem?,reason: Int)
+        {
+            super.onMediaItemTransition(mediaItem, reason)
+            val duration = player?.duration ?: 0L
+            val position = player?.currentPosition ?: 0L
+
+            if (duration > 0) {
+                barprogress.setDuration(duration)
+                barprogress.setPosition(position)
+            }
+
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+
+
+
+        }
+        @UnstableApi
+        override fun onScrubStart(timeBar: TimeBar, position: Long) {
+            player!!.pause()
+        }
+        @UnstableApi
+        override fun onScrubMove(timeBar: TimeBar, position: Long) {
+            tempDepart.text = position.toDuration(DurationUnit.MILLISECONDS).toString()
+
+        }
+        @UnstableApi
+        override fun onScrubStop(timeBar: TimeBar,position: Long,canceled: Boolean) {
+            if (!canceled) {
+                player!!.seekTo(position)
+                player!!.play()
+            }
+        }
+
     }
+
 
     override fun onStart() {
         super.onStart()
     }
-
-    override fun changement(nouvelleValeur: Int) {
-        TODO("Not yet implemented")
-    }
 }
+
+
+
+

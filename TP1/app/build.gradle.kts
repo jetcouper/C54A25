@@ -16,6 +16,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    kotlinOptions { //Par moi
+        freeCompilerArgs += listOf("-Xopt-in=androidx.media3.common.util.UnstableApi")
+    }
 
     buildTypes {
         release {

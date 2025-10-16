@@ -1,5 +1,6 @@
 package com.example.tp1
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.SimpleAdapter
 import android.widget.Toast
@@ -12,13 +13,14 @@ import org.json.JSONArray
 import org.json.JSONObject
 import android.text.format.DateUtils
 
-class ModeleChanson(context: Context) : Sujet {
+@SuppressLint("StaticFieldLeak")
+object ModeleChanson : Sujet {
     val url = "https://api.jsonbin.io/v3/b/680a6a1d8561e97a5006b822?meta=false"
     var contexte: Context ?= null
     var listemusique = ArrayList<HashMap<String, Any>>()
     private val observateurs = mutableListOf<ObservateurChangement>()
 
-    init {
+    fun init (context: Context) {
         initialiserListe(context)
     }
 
@@ -34,7 +36,7 @@ class ModeleChanson(context: Context) : Sujet {
                 listemusique = decomposerReponse(jsonarray)
                 //Avertir l'activité avec l'observateur, après le changement de la liste
                 avertirObservateurs()
-                Toast.makeText(context,"Response is: ${li.musiques.size}", Toast.LENGTH_LONG).show()
+                //Toast.makeText(context,"Response is: ${li.musiques.size}", Toast.LENGTH_LONG).show()
             },
             {
                 Toast.makeText(context,"Erreur", Toast.LENGTH_LONG).show()
