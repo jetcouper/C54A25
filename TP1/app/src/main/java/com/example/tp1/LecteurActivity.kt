@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,7 +25,7 @@ import kotlin.time.toDuration
 import androidx.media3.common.util.UnstableApi
 import kotlin.time.DurationUnit
 
-@OptIn(UnstableApi::class)
+
 class LecteurActivity : AppCompatActivity() {
     lateinit var lecteur: PlayerView
     var player : ExoPlayer? = null
@@ -36,7 +37,7 @@ class LecteurActivity : AppCompatActivity() {
     lateinit var preview: ImageButton
     lateinit var forward: ImageButton
     lateinit var playback: ImageButton
-    lateinit var barprogress: DefaultTimeBar
+    lateinit var barprogress: SeekBar
 
     lateinit var tempDepart: TextView
     lateinit var tempFin: TextView
@@ -119,11 +120,11 @@ class LecteurActivity : AppCompatActivity() {
         btnRetour.setOnClickListener(ec)
 
 
-        barprogress.addListener(ec)
+        barprogress.setOnSeekBarChangeListener(ec)
 
 
     }
-    inner class Ecouteur: View.OnClickListener, Player.Listener, TimeBar.OnScrubListener{
+    inner class Ecouteur: View.OnClickListener, Player.Listener, SeekBar.OnSeekBarChangeListener{
         override fun onClick(v: View?) {
             when(v){
                 play -> {
@@ -162,41 +163,18 @@ class LecteurActivity : AppCompatActivity() {
             }
         }
 
-        override fun onMediaItemTransition(mediaItem: MediaItem?,reason: Int)
-        {
-            super.onMediaItemTransition(mediaItem, reason)
-            val duration = player?.duration ?: 0L
-            val position = player?.currentPosition ?: 0L
-
-            if (duration > 0) {
-                barprogress.setDuration(duration)
-                barprogress.setPosition(position)
-            }
-
+        override fun onProgressChanged(seekBar: SeekBar?,progress: Int,fromUser: Boolean) {
+            TODO("Not yet implemented")
         }
 
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
-
-
-
+        override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            TODO("Not yet implemented")
         }
-        @UnstableApi
-        override fun onScrubStart(timeBar: TimeBar, position: Long) {
-            player!!.pause()
-        }
-        @UnstableApi
-        override fun onScrubMove(timeBar: TimeBar, position: Long) {
-            tempDepart.text = position.toDuration(DurationUnit.MILLISECONDS).toString()
 
+        override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            TODO("Not yet implemented")
         }
-        @UnstableApi
-        override fun onScrubStop(timeBar: TimeBar,position: Long,canceled: Boolean) {
-            if (!canceled) {
-                player!!.seekTo(position)
-                player!!.play()
-            }
-        }
+
 
     }
 

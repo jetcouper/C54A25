@@ -119,7 +119,7 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <androidx.media3.ui.DefaultTimeBar
+        <SeekBar
             android:id="@+id/progression"
             android:layout_width="0dp"
             android:layout_height="26dp"
