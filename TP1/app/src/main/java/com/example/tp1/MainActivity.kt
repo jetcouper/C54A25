@@ -85,11 +85,7 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
     }
 
     inner class ImageUrlViewBinder() : SimpleAdapter.ViewBinder{
-        override fun setViewValue(
-            view: View?,
-            data: Any?,
-            textRepresentation: String?
-        ): Boolean {
+        override fun setViewValue(view: View?,data: Any?,textRepresentation: String?): Boolean {
             if(view is ImageView && data is String){
                 Glide.with(this@MainActivity).load(data).into(view)
                 return true

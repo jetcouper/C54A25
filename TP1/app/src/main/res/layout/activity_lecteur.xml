@@ -12,11 +12,9 @@
         android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
         android:layout_weight="4"
         app:controller_layout_id="@layout/exo_player_layout"
-        app:resize_mode="fit"
-        app:use_controller="true" />
+        app:resize_mode="fit" />
 
     <Button
         android:id="@+id/retour"
@@ -24,6 +22,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:text="Retour"
-        android:textSize="40dp" />
+        android:textSize="40sp" />
 
 </LinearLayout>

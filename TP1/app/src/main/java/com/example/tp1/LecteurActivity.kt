@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -62,22 +63,14 @@ class LecteurActivity : AppCompatActivity() {
 
         lecteur = findViewById(R.id.playerView)
         player = ExoPlayer.Builder(this).build()
+        //lecteur.setUseController(false);
         lecteur.player = player
         val playlist = ArrayList<MediaItem>()
         if (hashMap != null) {
-            for (item in hashMap){
-                val imageBytes = try {
-                    URL(item["image"].toString()).readBytes()
-                } catch (e: Exception) {
-                    null
-                }
+            for (item in hashMap!!){
 
                 val metadata = MediaMetadata.Builder()
                     .setTitle(item["title"].toString())
-                    .apply {
-                        if (imageBytes != null)
-                            setArtworkData(imageBytes, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
-                    }
                     .build()
 
                 val mediaItem = MediaItem.Builder()
@@ -92,6 +85,7 @@ class LecteurActivity : AppCompatActivity() {
         player!!.prepare()
         player!!.seekTo(position.toInt(),0)
         player!!.play()
+        Toast.makeText(this, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
 
         play = lecteur.findViewById(R.id.play)
         pause = lecteur.findViewById(R.id.pause)
@@ -121,6 +115,8 @@ class LecteurActivity : AppCompatActivity() {
 
 
         barprogress.setOnSeekBarChangeListener(ec)
+        //barprogress.top = player!!.currentPosition.toInt()
+
 
 
     }
@@ -140,18 +136,24 @@ class LecteurActivity : AppCompatActivity() {
 
                 nextMusic -> {
                     player!!.seekToNextMediaItem()
+                    Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
+                    if(!player!!.hasNextMediaItem()){
 
+                    }
 
                 }
                 preview -> {
                     player!!.seekToPreviousMediaItem()
+                    Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                 }
                 forward -> {
+                    //10 seconde de plus
                     var nouvellePosition = player!!.currentPosition + 10000
                     player!!.seekTo(nouvellePosition)
 
                 }
                 playback -> {
+                    //10 seconde de moins
                     var nouvellePosition = (player!!.currentPosition - 10000).coerceAtLeast(0)
                     player!!.seekTo(nouvellePosition)
 
@@ -164,6 +166,7 @@ class LecteurActivity : AppCompatActivity() {
         }
 
         override fun onProgressChanged(seekBar: SeekBar?,progress: Int,fromUser: Boolean) {
+
             TODO("Not yet implemented")
         }
 
@@ -178,6 +181,11 @@ class LecteurActivity : AppCompatActivity() {
 
     }
 
+    override fun onStop() {
+        super.onStop()
+        player!!.release()
+        player = null
+    }
 
     override fun onStart() {
         super.onStart()

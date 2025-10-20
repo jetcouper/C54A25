@@ -36,7 +36,7 @@ object ModeleChanson : Sujet {
                 listemusique = decomposerReponse(jsonarray)
                 //Avertir l'activité avec l'observateur, après le changement de la liste
                 avertirObservateurs()
-                //Toast.makeText(context,"Response is: ${li.musiques.size}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context,"Liste de ${li.musiques.size} musique.", Toast.LENGTH_LONG).show()
             },
             {
                 Toast.makeText(context,"Erreur", Toast.LENGTH_LONG).show()
