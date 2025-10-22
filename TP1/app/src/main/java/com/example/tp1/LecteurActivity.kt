@@ -2,6 +2,8 @@ package com.example.tp1
 
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
@@ -10,6 +12,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -24,6 +27,7 @@ import java.net.URL
 import java.util.ArrayList
 import kotlin.time.toDuration
 import androidx.media3.common.util.UnstableApi
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 
@@ -45,9 +49,10 @@ class LecteurActivity : AppCompatActivity() {
     var hashMap : ArrayList<HashMap<String, Any>> ?= null
     var position : Long = 0
     lateinit var btnRetour: Button
+    var timer : CountDownTimer? = null
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    @OptIn(UnstableApi::class) override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_lecteur)
@@ -68,9 +73,20 @@ class LecteurActivity : AppCompatActivity() {
         val playlist = ArrayList<MediaItem>()
         if (hashMap != null) {
             for (item in hashMap!!){
+                val durationString = item["duration"] as String
+                var parties = durationString.split(":")
 
+                val minute = parties[0].toLongOrNull()
+                val seconde = parties[1].toLongOrNull()
+
+                val duration = seconde?.let {
+                    minute?.toDuration(DurationUnit.MINUTES)
+                        ?.plus(it.toDuration(DurationUnit.SECONDS))
+                }
+                val millisecondes = duration?.toLong(DurationUnit.MILLISECONDS)
                 val metadata = MediaMetadata.Builder()
                     .setTitle(item["title"].toString())
+                    .setDurationMs(millisecondes)
                     .build()
 
                 val mediaItem = MediaItem.Builder()
@@ -86,7 +102,8 @@ class LecteurActivity : AppCompatActivity() {
         player!!.seekTo(position.toInt(),0)
         player!!.play()
         Toast.makeText(this, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
-
+        timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+        timer?.start()
         play = lecteur.findViewById(R.id.play)
         pause = lecteur.findViewById(R.id.pause)
         shuffle = lecteur.findViewById(R.id.melanger)
@@ -112,7 +129,6 @@ class LecteurActivity : AppCompatActivity() {
         forward.setOnClickListener(ec)
         playback.setOnClickListener(ec)
         btnRetour.setOnClickListener(ec)
-
 
         barprogress.setOnSeekBarChangeListener(ec)
         //barprogress.top = player!!.currentPosition.toInt()
@@ -178,6 +194,21 @@ class LecteurActivity : AppCompatActivity() {
             TODO("Not yet implemented")
         }
 
+
+    }
+
+    inner class MonTimer(duration: Long, intervale : Long): CountDownTimer(duration,intervale)
+    {
+        private var millisDuration : Long = duration
+        override fun onTick(millisUntilFinished: Long) {
+            tempDepart.text = ((millisDuration - millisUntilFinished) + millisDuration).toDuration(DurationUnit.MILLISECONDS).toString()
+            tempFin.text = millisDuration.toDuration(DurationUnit.MILLISECONDS).toString()
+        }
+
+        override fun onFinish() {
+            tempFin.text = ""
+            tempDepart.text = ""
+        }
 
     }
 

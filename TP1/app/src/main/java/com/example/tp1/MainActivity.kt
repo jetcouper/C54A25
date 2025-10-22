@@ -84,6 +84,8 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
         liste.adapter = adapter
     }
 
+
+
     inner class ImageUrlViewBinder() : SimpleAdapter.ViewBinder{
         override fun setViewValue(view: View?,data: Any?,textRepresentation: String?): Boolean {
             if(view is ImageView && data is String){
