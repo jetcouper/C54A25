@@ -1,5 +1,7 @@
 package com.example.tp1
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -43,6 +45,7 @@ class LecteurActivity : AppCompatActivity() {
     lateinit var forward: ImageButton
     lateinit var playback: ImageButton
     lateinit var barprogress: SeekBar
+    lateinit var btnLien : Button
 
     lateinit var tempDepart: TextView
     lateinit var tempFin: TextView
@@ -50,6 +53,7 @@ class LecteurActivity : AppCompatActivity() {
     var position : Long = 0
     lateinit var btnRetour: Button
     var timer : CountDownTimer? = null
+    var tempSauvegarder : Long? = null
 
 
     @OptIn(UnstableApi::class) override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,6 +91,7 @@ class LecteurActivity : AppCompatActivity() {
                 val metadata = MediaMetadata.Builder()
                     .setTitle(item["title"].toString())
                     .setDurationMs(millisecondes)
+                    .setComposer(item["site"].toString())
                     .build()
 
                 val mediaItem = MediaItem.Builder()
@@ -116,6 +121,7 @@ class LecteurActivity : AppCompatActivity() {
         tempFin = lecteur.findViewById(R.id.position_fin)
         btnRetour = findViewById(R.id.retour)
         barprogress = lecteur.findViewById(R.id.progression)
+        btnLien = findViewById(R.id.lienChanson)
 
         val ec = Ecouteur()
         player!!.addListener(ec)
@@ -129,6 +135,7 @@ class LecteurActivity : AppCompatActivity() {
         forward.setOnClickListener(ec)
         playback.setOnClickListener(ec)
         btnRetour.setOnClickListener(ec)
+        btnLien.setOnClickListener(ec)
 
         barprogress.setOnSeekBarChangeListener(ec)
         barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
@@ -142,10 +149,15 @@ class LecteurActivity : AppCompatActivity() {
             when(v){
                 play -> {
                     player!!.play()
+                    timer?.start()
+
+
                 }
                 pause -> {
+
                     player!!.pause()
                     timer?.cancel()
+
                 }
                 shuffle -> {
                     player!!.shuffleModeEnabled = true
@@ -162,7 +174,10 @@ class LecteurActivity : AppCompatActivity() {
                         Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                     }
                     if(!player!!.hasNextMediaItem()){
-
+                        player!!.seekTo(0,0)
+                        barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
+                        timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+                        Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                     }
 
                 }
@@ -174,7 +189,10 @@ class LecteurActivity : AppCompatActivity() {
                         Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                     }
                     if(!player!!.hasPreviousMediaItem()){
-
+                        player!!.seekTo(0,0)
+                        barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
+                        timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+                        Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                     }
 
                 }
@@ -192,6 +210,10 @@ class LecteurActivity : AppCompatActivity() {
                 }
                 btnRetour -> {
                     finish()
+                }
+                btnLien -> {
+                    val i = Intent(Intent.ACTION_VIEW, Uri.parse((player!!.mediaMetadata.composer).toString()))
+                    startActivity(i)
                 }
 
             }

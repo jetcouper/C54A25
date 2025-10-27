@@ -16,12 +16,27 @@
         app:controller_layout_id="@layout/exo_player_layout"
         app:resize_mode="fit" />
 
-    <Button
-        android:id="@+id/retour"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Retour"
-        android:textSize="40sp" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/retour"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Retour"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/lienChanson"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Lien Chanson"
+            android:textSize="20sp" />
+    </LinearLayout>
 
 </LinearLayout>
