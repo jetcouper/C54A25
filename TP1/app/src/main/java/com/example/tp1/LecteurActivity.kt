@@ -131,36 +131,52 @@ class LecteurActivity : AppCompatActivity() {
         btnRetour.setOnClickListener(ec)
 
         barprogress.setOnSeekBarChangeListener(ec)
+        barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
         //barprogress.top = player!!.currentPosition.toInt()
 
 
 
     }
     inner class Ecouteur: View.OnClickListener, Player.Listener, SeekBar.OnSeekBarChangeListener{
-        override fun onClick(v: View?) {
+        @OptIn(UnstableApi::class) override fun onClick(v: View?) {
             when(v){
                 play -> {
                     player!!.play()
                 }
                 pause -> {
                     player!!.pause()
+                    timer?.cancel()
                 }
                 shuffle -> {
                     player!!.shuffleModeEnabled = true
                 }
-                repeat -> player!!.repeatMode
+                repeat -> {
+                    player!!.repeatMode
+                }
 
                 nextMusic -> {
-                    player!!.seekToNextMediaItem()
-                    Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
+                    if(player!!.hasNextMediaItem()){
+                        player!!.seekToNextMediaItem()
+                        barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
+                        timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+                        Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
+                    }
                     if(!player!!.hasNextMediaItem()){
 
                     }
 
                 }
                 preview -> {
-                    player!!.seekToPreviousMediaItem()
-                    Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
+                    if(player!!.hasPreviousMediaItem()){
+                        player!!.seekToPreviousMediaItem()
+                        barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
+                        timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+                        Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                    if(!player!!.hasPreviousMediaItem()){
+
+                    }
+
                 }
                 forward -> {
                     //10 seconde de plus
@@ -183,15 +199,14 @@ class LecteurActivity : AppCompatActivity() {
 
         override fun onProgressChanged(seekBar: SeekBar?,progress: Int,fromUser: Boolean) {
 
-            TODO("Not yet implemented")
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            TODO("Not yet implemented")
+
         }
 
 
@@ -201,8 +216,10 @@ class LecteurActivity : AppCompatActivity() {
     {
         private var millisDuration : Long = duration
         override fun onTick(millisUntilFinished: Long) {
-            tempDepart.text = ((millisDuration - millisUntilFinished) + millisDuration).toDuration(DurationUnit.MILLISECONDS).toString()
-            tempFin.text = millisDuration.toDuration(DurationUnit.MILLISECONDS).toString()
+            val elapsed = millisDuration - millisUntilFinished
+            tempDepart.text = DateUtils.formatElapsedTime(elapsed / 1000)
+            tempFin.text = DateUtils.formatElapsedTime(millisDuration / 1000)
+            barprogress.progress = elapsed.toInt()
         }
 
         override fun onFinish() {
