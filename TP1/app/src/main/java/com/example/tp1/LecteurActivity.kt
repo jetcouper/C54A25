@@ -46,6 +46,10 @@ class LecteurActivity : AppCompatActivity() {
     lateinit var playback: ImageButton
     lateinit var barprogress: SeekBar
     lateinit var btnLien : Button
+    lateinit var txtNom : TextView
+    lateinit var txtAlbum : TextView
+    lateinit var txtArtiste : TextView
+    lateinit var txtGenre : TextView
 
     lateinit var tempDepart: TextView
     lateinit var tempFin: TextView
@@ -54,6 +58,7 @@ class LecteurActivity : AppCompatActivity() {
     lateinit var btnRetour: Button
     var timer : CountDownTimer? = null
     var tempSauvegarder : Long? = null
+
 
 
     @OptIn(UnstableApi::class) override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +78,11 @@ class LecteurActivity : AppCompatActivity() {
         lecteur = findViewById(R.id.playerView)
         player = ExoPlayer.Builder(this).build()
         //lecteur.setUseController(false);
+
+        txtNom = findViewById(R.id.txtNomLecteur)
+        txtAlbum = findViewById(R.id.txtAlbumLecteur)
+        txtGenre = findViewById(R.id.txtGenreLecteur)
+        txtArtiste = findViewById(R.id.txtArtisteLecteur)
         lecteur.player = player
         val playlist = ArrayList<MediaItem>()
         if (hashMap != null) {
@@ -92,6 +102,9 @@ class LecteurActivity : AppCompatActivity() {
                     .setTitle(item["title"].toString())
                     .setDurationMs(millisecondes)
                     .setComposer(item["site"].toString())
+                    .setGenre(item["genre"].toString())
+                    .setArtist(item["artist"].toString())
+                    .setAlbumTitle(item["album"].toString())
                     .build()
 
                 val mediaItem = MediaItem.Builder()
@@ -106,6 +119,7 @@ class LecteurActivity : AppCompatActivity() {
         player!!.prepare()
         player!!.seekTo(position.toInt(),0)
         player!!.play()
+        changerText(player!!)
         Toast.makeText(this, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
         timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
         timer?.start()
@@ -122,6 +136,7 @@ class LecteurActivity : AppCompatActivity() {
         btnRetour = findViewById(R.id.retour)
         barprogress = lecteur.findViewById(R.id.progression)
         btnLien = findViewById(R.id.lienChanson)
+
 
         val ec = Ecouteur()
         player!!.addListener(ec)
@@ -150,14 +165,10 @@ class LecteurActivity : AppCompatActivity() {
                 play -> {
                     player!!.play()
                     timer?.start()
-
-
                 }
                 pause -> {
-
                     player!!.pause()
                     timer?.cancel()
-
                 }
                 shuffle -> {
                     player!!.shuffleModeEnabled = true
@@ -169,14 +180,20 @@ class LecteurActivity : AppCompatActivity() {
                 nextMusic -> {
                     if(player!!.hasNextMediaItem()){
                         player!!.seekToNextMediaItem()
+                        changerText(player!!)
                         barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
+                        timer?.cancel()
                         timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+                        timer?.start()
                         Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                     }
                     if(!player!!.hasNextMediaItem()){
                         player!!.seekTo(0,0)
+                        changerText(player!!)
                         barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
+                        timer?.cancel()
                         timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+                        timer?.start()
                         Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                     }
 
@@ -184,14 +201,21 @@ class LecteurActivity : AppCompatActivity() {
                 preview -> {
                     if(player!!.hasPreviousMediaItem()){
                         player!!.seekToPreviousMediaItem()
+                        changerText(player!!)
                         barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
+                        timer?.cancel()
                         timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+                        timer?.start()
                         Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                     }
                     if(!player!!.hasPreviousMediaItem()){
                         player!!.seekTo(0,0)
+                        changerText(player!!)
                         barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
+                        timer?.cancel()
+                        //timer = null
                         timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
+                        timer?.start()
                         Toast.makeText(this@LecteurActivity, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
                     }
 
@@ -200,12 +224,14 @@ class LecteurActivity : AppCompatActivity() {
                     //10 seconde de plus
                     var nouvellePosition = player!!.currentPosition + 10000
                     player!!.seekTo(nouvellePosition)
+                    timer?.cancel()
 
                 }
                 playback -> {
                     //10 seconde de moins
                     var nouvellePosition = (player!!.currentPosition - 10000).coerceAtLeast(0)
                     player!!.seekTo(nouvellePosition)
+                    timer?.cancel()
 
                 }
                 btnRetour -> {
@@ -236,8 +262,13 @@ class LecteurActivity : AppCompatActivity() {
 
     inner class MonTimer(duration: Long, intervale : Long): CountDownTimer(duration,intervale)
     {
+        val totalMilis : Long = 0
+
         private var millisDuration : Long = duration
         override fun onTick(millisUntilFinished: Long) {
+            //if(totalMilis != (0).toLong()){
+            //    millisUntilFinished = totalMilis
+            //}
             val elapsed = millisDuration - millisUntilFinished
             tempDepart.text = DateUtils.formatElapsedTime(elapsed / 1000)
             tempFin.text = DateUtils.formatElapsedTime(millisDuration / 1000)
@@ -250,15 +281,28 @@ class LecteurActivity : AppCompatActivity() {
         }
 
     }
+    fun changerText(player: ExoPlayer){
+        txtArtiste.text = player.mediaMetadata.artist
+        txtAlbum.text = player.mediaMetadata.albumTitle
+        txtNom.text = player.mediaMetadata.title
+        txtGenre.text = player.mediaMetadata.genre
+    }
 
     override fun onStop() {
         super.onStop()
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         player!!.release()
         player = null
     }
 
     override fun onStart() {
         super.onStart()
+
+
     }
 }
 

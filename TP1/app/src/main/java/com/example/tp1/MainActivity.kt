@@ -6,13 +6,16 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
+import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -27,7 +30,9 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
 
 
     lateinit var liste : ListView
+    lateinit var spinnerGenres : Spinner
     var listemusique = ArrayList<HashMap<String,Any>>()
+    var lanceur : ActivityResultLauncher<Intent>? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,16 +44,18 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
             insets
         }
         liste = findViewById(R.id.listPlaylist)
+        spinnerGenres = findViewById(R.id.spinnerListeGenre)
         val ec = Ecouteur()
         liste.onItemClickListener = ec
 
+        spinnerGenres.onItemSelectedListener = ec
 
 
 
 
     }
 
-    inner class Ecouteur : OnItemClickListener {
+    inner class Ecouteur : OnItemClickListener, AdapterView.OnItemSelectedListener {
         override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 
             //val linearlayout = view as LinearLayout
@@ -64,6 +71,57 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
 
         }
 
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+
+            val itemSelectionner = parent?.getItemAtPosition(position).toString()
+            chargerListeParGenre(itemSelectionner)
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+            parent?.getItemAtPosition(0)
+        }
+
+    }
+    fun chargerListeParGenre(item:String){
+        var listemusiqueGenre = ArrayList<HashMap<String,Any>>()
+        liste.adapter = null
+        if(item == "Tout les genres"){
+            listemusiqueGenre = ModeleChanson.retourListeMusique()
+            val from = arrayOf("title","artist","duration","image","genre")
+            val to = intArrayOf(R.id.txtTitle, R.id.txtArtiste,R.id.txtTemp,R.id.imageChanson, R.id.txtGenre)
+            val adapter = SimpleAdapter(this,listemusiqueGenre,R.layout.layoutlistemusique,from,to)
+            adapter.viewBinder = ImageUrlViewBinder()
+            liste.adapter = adapter
+        }
+        if(item != "Tout les genres"){
+            listemusiqueGenre = ModeleChanson.retourListeMusique()
+            listemusiqueGenre = listemusiqueGenre.filter { it["genre"] == item } as ArrayList<HashMap<String, Any>>
+            val from = arrayOf("title","artist","duration","image","genre")
+            val to = intArrayOf(R.id.txtTitle, R.id.txtArtiste,R.id.txtTemp,R.id.imageChanson, R.id.txtGenre)
+            val adapter = SimpleAdapter(this,listemusiqueGenre,R.layout.layoutlistemusique,from,to)
+            adapter.viewBinder = ImageUrlViewBinder()
+            liste.adapter = adapter
+        }
+
+    }
+
+
+    fun remplirSpinner(spinner: Spinner){
+        var listeGenres = ArrayList<String>()
+        var hashmapChanson = ModeleChanson.retourListeMusique()
+        listeGenres.add("Tout les genres")
+        for (chanson in hashmapChanson){
+            if(!listeGenres.contains(chanson["genre"])){
+                listeGenres.add(chanson["genre"] as String)
+            }
+        }
+        val adapter = ArrayAdapter(
+            this, // Context
+            android.R.layout.simple_spinner_item, // Default layout for spinner items
+            listeGenres
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
     }
 
     override fun onStart() {
@@ -73,14 +131,15 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
 
     }
 
+
     override fun changement(nouvelleValeur: Int) {
         //C'est ici que l'on réagi aux changement, on met à jour la ListView
         listemusique = ModeleChanson.retourListeMusique()
-        val from = arrayOf("title","artist","duration","image")
-        val to = intArrayOf(R.id.txtTitle, R.id.txtArtiste,R.id.txtTemp,R.id.imageChanson)
+        remplirSpinner(spinnerGenres)
+        val from = arrayOf("title","artist","duration","image","genre")
+        val to = intArrayOf(R.id.txtTitle, R.id.txtArtiste,R.id.txtTemp,R.id.imageChanson, R.id.txtGenre)
         val adapter = SimpleAdapter(this,listemusique,R.layout.layoutlistemusique,from,to)
         adapter.viewBinder = ImageUrlViewBinder()
-
         liste.adapter = adapter
     }
 
@@ -95,6 +154,4 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
             return false
         }
     }
-
-
 }
