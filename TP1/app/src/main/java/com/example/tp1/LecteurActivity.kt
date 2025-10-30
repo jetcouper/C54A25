@@ -9,6 +9,7 @@ import android.text.format.DateUtils
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.SeekBar
 import android.widget.TextView
@@ -16,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.media3.common.MediaItem
@@ -50,6 +52,7 @@ class LecteurActivity : AppCompatActivity() {
     lateinit var txtAlbum : TextView
     lateinit var txtArtiste : TextView
     lateinit var txtGenre : TextView
+    lateinit var main : LinearLayout
 
     lateinit var tempDepart: TextView
     lateinit var tempFin: TextView
@@ -73,10 +76,19 @@ class LecteurActivity : AppCompatActivity() {
 
         hashMap = ModeleChanson.listemusique //Appel du singleton
         position = intent!!.getIntExtra("position", 0).toLong()
-
-
+        main = findViewById(R.id.main)
         lecteur = findViewById(R.id.playerView)
         player = ExoPlayer.Builder(this).build()
+
+        if(!intent!!.getStringExtra("background").isNullOrEmpty() || intent!!.getIntExtra("volume", -1) != -1){
+            val couleurhex = intent!!.getStringExtra("background")
+            val volume = intent!!.getIntExtra("volume", -1)
+            main.setBackgroundColor(couleurhex!!.toColorInt())
+            player?.volume = (volume.toFloat()/100).toFloat()
+        }
+
+
+
         //lecteur.setUseController(false);
 
         txtNom = findViewById(R.id.txtNomLecteur)

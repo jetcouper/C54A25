@@ -2,11 +2,13 @@ package com.example.tp1
 
 import android.app.Application
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
@@ -15,7 +17,10 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -25,6 +30,7 @@ import com.bumptech.glide.Glide
 import com.example.tp1.ModeleChanson
 import com.example.tp1.Sujet
 import java.io.Serializable
+import androidx.core.graphics.toColorInt
 
 class MainActivity : AppCompatActivity(), ObservateurChangement {
 
@@ -33,6 +39,10 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
     lateinit var spinnerGenres : Spinner
     var listemusique = ArrayList<HashMap<String,Any>>()
     var lanceur : ActivityResultLauncher<Intent>? = null;
+    lateinit var btnOption : Button
+    lateinit var main : LinearLayout
+    var volumeMusique : Int? = null
+    var backgroundColor : String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,12 +55,34 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
         }
         liste = findViewById(R.id.listPlaylist)
         spinnerGenres = findViewById(R.id.spinnerListeGenre)
+        btnOption = findViewById(R.id.btnActiviteBoomerang)
+        main = findViewById(R.id.main)
         val ec = Ecouteur()
         liste.onItemClickListener = ec
 
         spinnerGenres.onItemSelectedListener = ec
 
+        btnOption.setOnClickListener{v:View -> lanceur?.launch(Intent(this@MainActivity,OptionsActivity::class.java))}
 
+
+        lanceur = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            CallBackElement()
+        )
+
+    }
+    inner class CallBackElement : ActivityResultCallback<ActivityResult>{
+        override fun onActivityResult(result: ActivityResult) {
+            var i = result.data
+            if(result.resultCode == RESULT_OK){
+                val couleurhex = i!!.getStringExtra("couleur")
+                val volume = i!!.getIntExtra("volume", -1)
+                main.setBackgroundColor(couleurhex!!.toColorInt())
+                volumeMusique = volume
+                backgroundColor = couleurhex
+
+            }
+        }
 
 
     }
@@ -66,6 +98,12 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
             val intent = Intent(this@MainActivity, LecteurActivity::class.java)
             intent.putExtra("musique", item as Serializable)
             intent.putExtra("position", itemPos)
+            if(volumeMusique != null){
+                intent.putExtra("volume", volumeMusique)
+            }
+            if(backgroundColor != null){
+                intent.putExtra("background", backgroundColor)
+            }
             startActivity(intent)
             //Toast.makeText(this@MainActivity,textview.text.toString(), Toast.LENGTH_SHORT).show()
 
