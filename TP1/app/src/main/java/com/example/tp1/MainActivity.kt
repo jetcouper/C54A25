@@ -43,10 +43,11 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
 
     lateinit var liste : ListView
     lateinit var spinnerGenres : Spinner
-    var listemusique = ArrayList<HashMap<String,Any>>()
-    var lanceur : ActivityResultLauncher<Intent>? = null;
     lateinit var btnOption : Button
     lateinit var main : LinearLayout
+
+    var listemusique = ArrayList<HashMap<String,Any>>()
+    var lanceur : ActivityResultLauncher<Intent>? = null;
     var volumeMusique : Int? = null
     var backgroundColor : String? = null
     var position : Int? = null
@@ -117,6 +118,8 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
             CallBackElement()
         )
     }
+
+    //Le retour de l'activité options avec ces résultats
     inner class CallBackElement : ActivityResultCallback<ActivityResult>{
         override fun onActivityResult(result: ActivityResult) {
             var i = result.data
@@ -137,10 +140,10 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
 
     }
 
+
     inner class Ecouteur : OnItemClickListener, AdapterView.OnItemSelectedListener {
         override fun onItemClick(parent: AdapterView<*>?, view: View?, positionItem: Int, id: Long) {
 
-            //val linearlayout = view as LinearLayout
             val genreChoisi = spinnerGenres.selectedItem.toString()
             listemusiqueGenre = ModeleChanson.retourListeMusique()
 
@@ -154,7 +157,7 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
             val item = listemusiqueGenre
             position = positionItem
 
-            //val textview = linearlayout.findViewById<TextView>(R.id.txtTitle)
+
             val intent = Intent(this@MainActivity, LecteurActivity::class.java)
             intent.putExtra("musique", item as Serializable)
             intent.putExtra("position", position)
@@ -179,6 +182,8 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
         }
 
     }
+
+    //Dépendament de ce qui est choisi dans le spinner, la listview va charger la liste choisi
     fun chargerListeParGenre(item:String){
         var listemusiqueGenre = ArrayList<HashMap<String,Any>>()
         liste.adapter = null
@@ -203,7 +208,7 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
 
     }
 
-
+    //Remplir le spinner de mes genres de musique. (Éviter les doublons)
     fun remplirSpinner(spinner: Spinner, selection: String? = null){
         var listeGenres = ArrayList<String>()
         var hashmapChanson = ModeleChanson.retourListeMusique()
@@ -222,8 +227,6 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val tv = super.getView(position, convertView, parent) as TextView
                 tv.setTextColor(ContextCompat.getColor(context, R.color.white))
-                //tv.background = null
-                //tv.setBackgroundResource(R.drawable.effet_spinner)
                 return tv
             }
 
@@ -231,13 +234,13 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
                 val tv = super.getDropDownView(position, convertView, parent) as TextView
                 tv.setTextColor(ContextCompat.getColor(context, R.color.white))
                 tv.setBackgroundResource(R.drawable.effet_spinner_items)
-
                 return tv
             }
         }
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
+        //Dépendament du genre choisi en paramètre, il va sélectionner le genre dans le spinner
         selection?.let {
             val index = listeGenres.indexOf(it)
             if (index >= 0) {

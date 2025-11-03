@@ -30,7 +30,6 @@ import androidx.media3.common.util.UnstableApi
 
 class LecteurActivity : AppCompatActivity() {
     lateinit var lecteur: PlayerView
-    var player : ExoPlayer? = null
     lateinit var play: ImageButton
     lateinit var pause: ImageButton
     lateinit var nextMusic: ImageButton
@@ -48,6 +47,7 @@ class LecteurActivity : AppCompatActivity() {
     lateinit var tempDepart: TextView
     lateinit var tempFin: TextView
 
+    var player : ExoPlayer? = null
     var hashMap : ArrayList<HashMap<String, Any>> ?= null
     var timer : CountDownTimer? = null
     var volumeMusique: Int? = null
@@ -89,9 +89,9 @@ class LecteurActivity : AppCompatActivity() {
 
 
 
-
+        //Restauration du dernier événement avec ces composantes
         val etat = SerialisationUtil.restaurerEtat(this)
-        if (etat?.activiteCourante == this::class.java.name) {
+        if (etat!!.activiteCourante == this::class.java.name) {
             hashMap = etat.extraIntent["musique"] as? ArrayList<HashMap<String, Any>>
             positionIndex = etat.extraIntent["currentIndex"] as? Int ?: 0
             positionMs = etat.extraIntent["currentPosition"] as? Long ?: 0L
@@ -110,31 +110,20 @@ class LecteurActivity : AppCompatActivity() {
         // Couleur de fond
         backgroundColor?.let { main.setBackgroundColor(it.toColorInt()) }
 
-
+        //Initialisation du player avec son volume
         player = ExoPlayer.Builder(this).build()
         lecteur.player = player
         player?.volume = (volumeMusique?.toFloat() ?: 100f) / 100f
 
 
 
-
+        //Création d'une playlist avec les métaDonnées
         val playlist = ArrayList<MediaItem>()
         if (hashMap != null) {
             for (item in hashMap!!){
-//                val durationString = item["duration"] as String
-//                var parties = durationString.split(":")
-//
-//                val minute = parties[0].toLongOrNull()
-//                val seconde = parties[1].toLongOrNull()
-//
-//                val duration = seconde?.let {
-//                    minute?.toDuration(DurationUnit.MINUTES)
-//                        ?.plus(it.toDuration(DurationUnit.SECONDS))
-//                }
 
                 val metadata = MediaMetadata.Builder()
                     .setTitle(item["title"].toString())
-                    //.setDurationMs(duration?.toLong(DurationUnit.MILLISECONDS))
                     .setComposer(item["site"].toString())
                     .setGenre(item["genre"].toString())
                     .setArtist(item["artist"].toString())
@@ -156,17 +145,7 @@ class LecteurActivity : AppCompatActivity() {
         player!!.seekTo(positionIndex, positionMs)
         player!!.playWhenReady = isPlaying
 
-
-
-
-//        player!!.seekTo(positionIndex,positionMs)
-//        player!!.playWhenReady = isPlaying
-//        changerText(player!!)
-//        Toast.makeText(this, player!!.mediaMetadata.title.toString(), Toast.LENGTH_SHORT).show()
-//        timer = MonTimer(player!!.mediaMetadata.durationMs as Long, 1000)
-//        timer?.start()
-
-
+        //Initialisation des écouteur
         play.setOnClickListener(ec)
         pause.setOnClickListener(ec)
         nextMusic.setOnClickListener(ec)
@@ -175,10 +154,7 @@ class LecteurActivity : AppCompatActivity() {
         playback.setOnClickListener(ec)
         btnRetour.setOnClickListener(ec)
         btnLien.setOnClickListener(ec)
-
         barprogress.setOnSeekBarChangeListener(ec)
-        //barprogress.max = (player!!.mediaMetadata.durationMs?.toInt()!!)
-        //barprogress.top = player!!.currentPosition.toInt()
 
 
 
@@ -201,6 +177,7 @@ class LecteurActivity : AppCompatActivity() {
                         player!!.seekToNextMediaItem()
                         player!!.playWhenReady = true
                     }
+                    //S'il n'y a pas de prochaine musique, retourner au début de la playlist.
                     else{
                         player!!.seekTo(0,0)
                         player!!.playWhenReady = true
@@ -241,6 +218,7 @@ class LecteurActivity : AppCompatActivity() {
             }
         }
 
+        //Si je veux changer la position de la musique en cours
         override fun onProgressChanged(seekBar: SeekBar?,progress: Int,fromUser: Boolean) {
             if(fromUser){
                 player!!.pause()
@@ -258,6 +236,7 @@ class LecteurActivity : AppCompatActivity() {
 
         }
 
+        //Changement de l'affichage à chaque fois que la médiaData(Musique) change
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onMediaMetadataChanged(mediaMetadata)
             if (player != null) {
@@ -272,6 +251,7 @@ class LecteurActivity : AppCompatActivity() {
             }
         }
 
+        //Si la mediaData est charger depuis une sérialisation(Plus stable).
         @OptIn(UnstableApi::class) override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
             if (playbackState == Player.STATE_READY && !restorerUneFois) {
@@ -293,6 +273,7 @@ class LecteurActivity : AppCompatActivity() {
         }
     }
 
+    //Création du timer, à chaque Tick les textes changent ainsi que la seekbar pour quelle bouge
     inner class MonTimer(duration: Long, intervale : Long): CountDownTimer(duration,intervale)
     {
         override fun onTick(millisUntilFinished: Long) {
@@ -306,11 +287,14 @@ class LecteurActivity : AppCompatActivity() {
 
         }
 
+        //Lorsque la musique fini, une autre reprend
         override fun onFinish() {
             player!!.play()
         }
 
     }
+
+    //Changement des textes, dépendament de la musique en cours.
     fun changerText(player: ExoPlayer){
         txtArtiste.text = player.mediaMetadata.artist
         txtAlbum.text = player.mediaMetadata.albumTitle
@@ -318,6 +302,7 @@ class LecteurActivity : AppCompatActivity() {
         txtGenre.text = player.mediaMetadata.genre
     }
 
+    //Lorsque l'on s'apprète à quitter l'application, une sauvegarde est effectué.
     override fun onPause() {
         super.onPause()
         // Sauvegarde complète de l'état
@@ -335,17 +320,12 @@ class LecteurActivity : AppCompatActivity() {
         timer?.cancel()
     }
 
+    //Lorsque l'on quitte l'activité, le player est effacer et le timer arrêté.
     override fun onDestroy() {
         super.onDestroy()
         player!!.release()
         player = null
         timer?.cancel()
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-
     }
 }
 
