@@ -1,5 +1,6 @@
 package com.example.tp1
 
+import EtatApplication
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
@@ -10,6 +11,8 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -19,6 +22,8 @@ class OptionsActivity : AppCompatActivity() {
     lateinit var boutonConfirme: Button
     lateinit var audioManager: AudioManager
     lateinit var txtVolume : TextView
+    lateinit var main : ConstraintLayout
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +34,38 @@ class OptionsActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        main = findViewById(R.id.main)
         couleurback = findViewById(R.id.txtBackgroundColor)
         boutonConfirme = findViewById(R.id.btnAppliquer)
         //setContentView(R.layout.activity_main)
         seekVolume = findViewById(R.id.seekBarVolume)
         txtVolume = findViewById(R.id.txtVolumeValue)
-        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-        // Example: Increase volume
-        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
+        val etat = SerialisationUtil.restaurerEtat(this)
+        etat?.extraIntent?.let { extras ->
+            val savedVolume = extras["volume"] as? Int ?: 0
+            val savedCouleur = extras["background"] as? String ?: "#FFFFFF"
+
+            txtVolume.text = savedVolume.toString()
+            couleurback.text = savedCouleur
+            seekVolume.progress = savedVolume
+            main.setBackgroundColor(savedCouleur.toColorInt())
+        }
+
+
+
+
+
+        if(!intent!!.getStringExtra("couleur").isNullOrEmpty() || intent!!.getIntExtra("volume", -1) != -1){
+            txtVolume.text = intent!!.getIntExtra("volume", -1).toString()
+            couleurback.text = intent!!.getStringExtra("couleur").toString()
+            main.setBackgroundColor(intent!!.getStringExtra("couleur")!!.toColorInt())
+        }
+
+        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        // Le volume actuel
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        // Le volume maximale
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         seekVolume.max = maxVolume
         seekVolume.progress = currentVolume
@@ -46,16 +74,16 @@ class OptionsActivity : AppCompatActivity() {
         val ec = Ecouteur()
         seekVolume.setOnSeekBarChangeListener(ec)
         boutonConfirme.setOnClickListener {
-            var i = Intent()
-            var couleur = couleurback.text.toString().trim()
-            var volume = seekVolume.progress
+            val couleur = couleurback.text.toString().trim()
+            val volume = seekVolume.progress
+
             if(estCouleurHexValide(couleur)){
-                i.putExtra("couleur",couleur)
-                i.putExtra("volume", volume)
-                setResult(RESULT_OK,i)
+                val intent = Intent()
+                intent.putExtra("couleur", couleur)
+                intent.putExtra("volume", volume)
+                setResult(RESULT_OK, intent)
                 finish()
-            }
-            else{
+            } else {
                 couleurback.error = "Le format de couleur est invalide. Format attendu : #RRGGBB ou #AARRGGBB"
             }
 
@@ -85,5 +113,19 @@ class OptionsActivity : AppCompatActivity() {
         }
 
 
+    }
+    override fun onStop() {
+        super.onStop()
+        val extras = HashMap<String, Any>()
+        extras["volume"] = seekVolume.progress
+        extras["couleur"] = couleurback.text.toString()
+        extras["seekVolume"] = seekVolume.progress
+
+        val etat = EtatApplication(
+            activiteCourante = this::class.java.name,
+            extraIntent = extras
+        )
+
+        SerialisationUtil.sauvegarderEtat(this, etat)
     }
 }

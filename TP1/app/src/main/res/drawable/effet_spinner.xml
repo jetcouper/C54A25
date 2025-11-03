@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- État normal -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="20dp" />
+            <stroke
+                android:width="5dp"
+                android:color="@color/mauve" />
+            <gradient
+                android:angle="350"
+                android:startColor="@color/bleu_roi"
+                android:endColor="@color/rouge_fonce"
+                android:type="linear" />
+        </shape>
+    </item>
+    <item
+        android:right="12dp"
+        android:top="12dp"
+        android:bottom="12dp"
+        android:end="12dp"
+        android:gravity="end|center_vertical"
+        android:drawable="@android:drawable/arrow_down_float" />
+
+</layer-list>

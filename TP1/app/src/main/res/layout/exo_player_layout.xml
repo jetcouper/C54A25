@@ -38,26 +38,6 @@
             android:tintMode="src_in" />
 
         <ImageButton
-            android:id="@+id/melanger"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            android:scaleType="centerInside"
-            android:src="@drawable/shuffle"
-            android:tintMode="src_in" />
-
-        <ImageButton
-            android:id="@+id/repeter"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            android:scaleType="centerInside"
-            android:src="@drawable/repeat"
-            android:tintMode="src_in" />
-
-        <ImageButton
             android:id="@+id/play"
             android:layout_width="48dp"
             android:layout_height="48dp"

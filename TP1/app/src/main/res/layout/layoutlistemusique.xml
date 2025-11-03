@@ -10,13 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@drawable/effet_listview"
+        app:backgroundTint="@null"
+        android:theme="@style/Theme.TP1.couleurTexte">
 
         <ImageView
             android:id="@+id/imageChanson"
             android:layout_width="0dp"
             android:layout_height="400px"
-            android:layout_weight="1"
+            android:layout_marginLeft="30px"
+            android:layout_weight="0.75"
             tools:srcCompat="@tools:sample/avatars" />
 
         <LinearLayout
@@ -54,7 +58,8 @@
             android:id="@+id/txtTemp"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_marginRight="30px"
+            android:layout_weight="0.5"
             android:gravity="center|right"
             android:text="TextView" />
     </LinearLayout>

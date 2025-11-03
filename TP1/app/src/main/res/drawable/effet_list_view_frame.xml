@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- État normal -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" /> <!-- Ajout important -->
+            <corners android:radius="10dp" />
+            <stroke
+                android:width="15dp"
+                android:color="@color/mauve" />
+        </shape>
+    </item>
+</selector>
