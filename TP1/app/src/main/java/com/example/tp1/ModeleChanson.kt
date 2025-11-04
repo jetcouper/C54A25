@@ -20,6 +20,7 @@ object ModeleChanson : Sujet {
     var listemusique = ArrayList<HashMap<String, Any>>()
     private val observateurs = mutableListOf<ObservateurChangement>()
 
+    //Initialiser le modèle Singleton avec le contexte du MainActivity
     fun init (context: Context) {
         initialiserListe(context)
     }

@@ -69,8 +69,9 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
         btnOption = findViewById(R.id.btnActiviteBoomerang)
         main = findViewById(R.id.main)
 
-        val etat = SerialisationUtil.restaurerEtat(this)
 
+        //Restauration du dernier événement avec ces composantes
+        val etat = SerialisationUtil.restaurerEtat(this)
         if (etat != null) {
             // Si l'activité sauvegardée n'est pas MainActivity, on la lance au-dessus
             if (etat.activiteCourante != this::class.java.name) {
@@ -144,11 +145,9 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
     inner class Ecouteur : OnItemClickListener, AdapterView.OnItemSelectedListener {
         override fun onItemClick(parent: AdapterView<*>?, view: View?, positionItem: Int, id: Long) {
 
+            //Populer le spinner
             val genreChoisi = spinnerGenres.selectedItem.toString()
             listemusiqueGenre = ModeleChanson.retourListeMusique()
-
-
-
             if(spinnerGenres.selectedItem != "Tout les genres"){
                 listemusiqueGenre = listemusiqueGenre?.filter {
                     it["genre"] == genreChoisi
@@ -157,7 +156,7 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
             val item = listemusiqueGenre
             position = positionItem
 
-
+            //Si un item est sélectionné, on ouvre l'activité du player avec les objets à envoyer.
             val intent = Intent(this@MainActivity, LecteurActivity::class.java)
             intent.putExtra("musique", item as Serializable)
             intent.putExtra("position", position)
@@ -172,12 +171,13 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
         }
 
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-
+            //Charger la listView avec l'élément du spinner sélectionné.
             val itemSelectionner = parent?.getItemAtPosition(position).toString()
             chargerListeParGenre(itemSelectionner)
         }
 
         override fun onNothingSelected(parent: AdapterView<*>?) {
+            //S'il n'y a rien de sélectionné, prend le premier item.
             parent?.getItemAtPosition(0)
         }
 
@@ -223,13 +223,13 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
             android.R.layout.simple_spinner_item,
             listeGenres
         )
-        {
+        {   //Pour l'application des styles de texte.
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val tv = super.getView(position, convertView, parent) as TextView
                 tv.setTextColor(ContextCompat.getColor(context, R.color.white))
                 return tv
             }
-
+            //Pour l'application des styles de background.
             override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val tv = super.getDropDownView(position, convertView, parent) as TextView
                 tv.setTextColor(ContextCompat.getColor(context, R.color.white))
@@ -249,14 +249,14 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
         }
 
     }
-
+    //Va charger le modèle pour la liste.
     override fun onStart() {
         super.onStart()
         ModeleChanson.init(applicationContext) //applicationContext pour éviter les memory leak
         ModeleChanson.ajouterObservateur(this)
 
     }
-
+    //À la fin de l'activité, une sérialisation s'éffectura pour garder en mémoire la dernière activité ouvert
     override fun onPause() {
         super.onPause()
         val extras = HashMap<String, Any>()
@@ -288,7 +288,7 @@ class MainActivity : AppCompatActivity(), ObservateurChangement {
     }
 
 
-
+    //Le glider pour charger correctement les image de URL
     inner class ImageUrlViewBinder() : SimpleAdapter.ViewBinder{
         override fun setViewValue(view: View?,data: Any?,textRepresentation: String?): Boolean {
             if(view is ImageView && data is String){

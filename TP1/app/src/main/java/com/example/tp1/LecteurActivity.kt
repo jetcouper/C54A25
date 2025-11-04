@@ -211,6 +211,7 @@ class LecteurActivity : AppCompatActivity() {
                     finish()
                 }
                 btnLien -> {
+                    //Lien vers internet
                     val i = Intent(Intent.ACTION_VIEW, Uri.parse((player!!.mediaMetadata.composer).toString()))
                     startActivity(i)
                 }

@@ -37,10 +37,10 @@ class OptionsActivity : AppCompatActivity() {
         main = findViewById(R.id.main)
         couleurback = findViewById(R.id.txtBackgroundColor)
         boutonConfirme = findViewById(R.id.btnAppliquer)
-        //setContentView(R.layout.activity_main)
         seekVolume = findViewById(R.id.seekBarVolume)
         txtVolume = findViewById(R.id.txtVolumeValue)
 
+        //Restauration du dernier événement avec ces composantes
         val etat = SerialisationUtil.restaurerEtat(this)
         etat?.extraIntent?.let { extras ->
             val savedVolume = extras["volume"] as? Int ?: 0
@@ -52,16 +52,13 @@ class OptionsActivity : AppCompatActivity() {
             main.setBackgroundColor(savedCouleur.toColorInt())
         }
 
-
-
-
-
+        //Si je reçois quelques chose du MainActivity, alors peupler ses éléments.
         if(!intent!!.getStringExtra("couleur").isNullOrEmpty() || intent!!.getIntExtra("volume", -1) != -1){
             txtVolume.text = intent!!.getIntExtra("volume", -1).toString()
             couleurback.text = intent!!.getStringExtra("couleur").toString()
             main.setBackgroundColor(intent!!.getStringExtra("couleur")!!.toColorInt())
         }
-
+        //Le système de volume générale du téléphone
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         // Le volume actuel
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
@@ -91,6 +88,7 @@ class OptionsActivity : AppCompatActivity() {
         }
 
     }
+    //Validation pour voir si le reghex est valide.
     fun estCouleurHexValide(couleur: String): Boolean {
         val regex = Regex("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$")
         return regex.matches(couleur)
@@ -116,6 +114,7 @@ class OptionsActivity : AppCompatActivity() {
     }
     override fun onStop() {
         super.onStop()
+        //À la fin de l'activité, une sérialisation s'éffectura pour garder en mémoire la dernière activité ouvert.
         val extras = HashMap<String, Any>()
         extras["volume"] = seekVolume.progress
         extras["couleur"] = couleurback.text.toString()
